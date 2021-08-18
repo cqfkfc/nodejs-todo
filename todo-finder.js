@@ -45,9 +45,7 @@ const getFilesWithTODO = async function (userInput) {
 
   console.log(results);
   if (userInput === undefined) {
-    console.log(
-      "Results generated from test directory when no path is defined. "
-    );
+    console.log("Results generated from test directory");
   } else {
     console.log("Results generated from: ", userInput);
   }
