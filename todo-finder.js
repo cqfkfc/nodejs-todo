@@ -10,12 +10,12 @@ var fileContainsText = async function (fileAbsolutePath) {
 
 var checkNestedFilesForText = async function (directoryAbsolutePath) {
   const filesOrFolders = await fs.promises.readdir(directoryAbsolutePath);
-  const epoches = Promise.all(
+  const promises = Promise.all(
     filesOrFolders.map(async (filesOrFolders) => {
       const fullPath = path.join(directoryAbsolutePath, filesOrFolders);
       const fileStat = await fs.promises.stat(fullPath);
       if (fileStat.isDirectory()) {
-        const nestedFilesResults = await checkNestedFilesForText(fullPath);
+        const nestedFilesResults = await checkNestedFilesForText(fullPath); // recursively check for nested files
         return nestedFilesResults;
       }
       if (fileStat.isFile()) {
@@ -25,7 +25,7 @@ var checkNestedFilesForText = async function (directoryAbsolutePath) {
     })
   );
 
-  const results = await epoches;
+  const results = await promises;
 
   return results
     .filter(
