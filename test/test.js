@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 const path = require("path");
 
-const { getFilesInDirContainingText } = require("../todo-finder");
+const { getFilesContainingText } = require("../todo-finder");
 
 describe("search todo in directory", () => {
   it("example provided in github", async () => {
@@ -17,10 +17,7 @@ describe("search todo in directory", () => {
       "\\somedir3\\another_file.js",
     ];
 
-    const actualOutput = await getFilesInDirContainingText(
-      testPathAbsolute,
-      "TODO"
-    );
+    const actualOutput = await getFilesContainingText(testPathAbsolute, "TODO");
 
     // there should only be 6 files
     expect(actualOutput.length).to.equal(6);

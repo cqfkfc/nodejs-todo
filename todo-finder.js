@@ -6,17 +6,15 @@ var fileContainsText = async function (fileAbsolutePath, text) {
   return data.includes(text);
 };
 
-var getFilesInDirContainingText = async function (directoryAbsolutePath, text) {
+var getFilesContainingText = async function (directoryAbsolutePath, text) {
+  // this return all files that contain the defined text, in the directory
   const filesOrFolders = await fs.promises.readdir(directoryAbsolutePath);
   const promises = Promise.all(
     filesOrFolders.map(async (filesOrFolders) => {
       const fullPath = path.join(directoryAbsolutePath, filesOrFolders);
       const fileStat = await fs.promises.stat(fullPath);
       if (fileStat.isDirectory()) {
-        const nestedFilesResults = await getFilesInDirContainingText(
-          fullPath,
-          text
-        ); // recursively check for nested files
+        const nestedFilesResults = await getFilesContainingText(fullPath, text); // recursively check for nested files
         return nestedFilesResults;
       }
       if (fileStat.isFile()) {
@@ -42,7 +40,7 @@ const printFilesContainingText = async function (userDefinedDirectory, text) {
   if (userDefinedDirectory !== undefined) {
     selectedDirectory = userDefinedDirectory;
   }
-  const results = await getFilesInDirContainingText(selectedDirectory, text);
+  const results = await getFilesContainingText(selectedDirectory, text);
 
   console.log(results);
   if (userDefinedDirectory === undefined) {
@@ -55,4 +53,4 @@ const printFilesContainingText = async function (userDefinedDirectory, text) {
 const userDefinedDirectory = process.argv[2];
 printFilesContainingText(userDefinedDirectory, "TODO");
 
-module.exports.getFilesInDirContainingText = getFilesInDirContainingText;
+module.exports.getFilesContainingText = getFilesContainingText;
