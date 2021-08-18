@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 const path = require("path");
 
-const { checkNestedFilesForText } = require("../todo-finder");
+const { getFilesInDirContainingText } = require("../todo-finder");
 
 describe("search todo in directory", () => {
   it("example provided in github", async () => {
@@ -17,7 +17,10 @@ describe("search todo in directory", () => {
       "\\somedir3\\another_file.js",
     ];
 
-    const actualOutput = await checkNestedFilesForText(testPathAbsolute);
+    const actualOutput = await getFilesInDirContainingText(
+      testPathAbsolute,
+      "TODO"
+    );
 
     // there should only be 6 files
     expect(actualOutput.length).to.equal(6);
