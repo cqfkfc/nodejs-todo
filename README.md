@@ -13,3 +13,5 @@
  
  ## To run tests
  `npm test`
+ 
+ Tests can be found at https://github.com/cqfkfc/nodejs-todo/blob/main/test/test.js
