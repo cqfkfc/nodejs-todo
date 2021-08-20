@@ -7,15 +7,15 @@ var fileContainsText = async function (fileAbsolutePath, text) {
 };
 
 var getFilesContainingText = async function (directoryAbsolutePath, text) {
-  // this return all files that contain the defined text, in the directory
   const filesOrFolders = await fs.promises.readdir(directoryAbsolutePath);
+
   const promises = Promise.all(
     filesOrFolders.map(async (filesOrFolders) => {
       const fullPath = path.join(directoryAbsolutePath, filesOrFolders);
       const fileStat = await fs.promises.stat(fullPath);
       if (fileStat.isDirectory()) {
-        const nestedFilesResults = await getFilesContainingText(fullPath, text); // recursively check for nested files
-        return nestedFilesResults;
+        // recursively check for nested files
+        return await getFilesContainingText(fullPath, text);
       }
       if (fileStat.isFile()) {
         if (await fileContainsText(fullPath, text)) return fullPath;
@@ -24,9 +24,7 @@ var getFilesContainingText = async function (directoryAbsolutePath, text) {
     })
   );
 
-  const results = await promises;
-
-  return results
+  return (await promises)
     .filter(
       (file) => file !== undefined // files with no TODO string
     )
