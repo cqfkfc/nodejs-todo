@@ -34,20 +34,15 @@ var getFilesContainingText = async function (directoryAbsolutePath, text) {
 };
 
 const printFilesContainingText = async function (userDefinedDirectory, text) {
-  let selectedDirectory = "./test/test_example";
-  // defaults to test directory if path is not stated
+  const testDirectory = "./test/test_example";
 
-  if (userDefinedDirectory !== undefined) {
-    selectedDirectory = userDefinedDirectory;
-  }
-  const results = await getFilesContainingText(selectedDirectory, text);
+  const searchDirectory =
+    userDefinedDirectory === undefined ? testDirectory : userDefinedDirectory;
+
+  const results = await getFilesContainingText(searchDirectory, text);
 
   console.log(results);
-  if (userDefinedDirectory === undefined) {
-    console.log("Results generated from test directory");
-  } else {
-    console.log("Results generated from: ", userDefinedDirectory);
-  }
+  console.log("Results generated from: ", searchDirectory);
 };
 
 const userDefinedDirectory = process.argv[2];

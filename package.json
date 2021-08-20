@@ -6,11 +6,13 @@
   "dependencies": {
     "chai": "^4.3.4",
     "graceful-fs": "^4.2.8",
-    "mocha": "^9.0.3"
+    "mocha": "^9.0.3",
+    "mocha-sinon": "^2.1.2",
+    "nyc": "^15.1.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "mocha"
+    "test": "nyc mocha"
   },
   "repository": {
     "type": "git",

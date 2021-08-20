@@ -26,4 +26,17 @@ describe("search todo in directory", () => {
       expect(output).to.contain.oneOf(expectedOutput)
     );
   });
+
+  it("text not found in any files", async () => {
+    const testDir = "./test_example";
+    const testPathAbsolute = path.join(__dirname, testDir);
+
+    const actualOutput = await getFilesContainingText(
+      testPathAbsolute,
+      "thisTextThatDoesntExist"
+    );
+
+    // there should be no files
+    expect(actualOutput.length).to.equal(0);
+  });
 });
