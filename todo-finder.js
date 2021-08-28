@@ -49,6 +49,33 @@ var getAllFilesFromDirectory = async function (directoryAbsolutePath) {
     .flat(Infinity);
 };
 
+var run = async function (testPathAbsolute, text) {
+  const files = await getAllFilesFromDirectory(testPathAbsolute);
+  const results = await Promise.all(
+    files.map(async (file) => ({
+      filepath: path.relative(testPathAbsolute, file.filepath),
+      containsText: fileContainsText(file.data, text, (caseSensitive = false)),
+    }))
+  );
+
+  const resultsClean = results
+    .filter((file) => file.containsText === true)
+    .map((file) => file.filepath);
+
+  console.log(resultsClean);
+};
+
+function convertUserInputToAbsolutePath(userInput) {
+  const testPath = "/test/test_example";
+  const absolutepath =
+    userInput === undefined
+      ? path.join(__dirname, testPath)
+      : path.join(__dirname, userInput);
+  return absolutepath;
+}
+
+const absPath = convertUserInputToAbsolutePath(process.argv[2]);
+run(absPath, "TODO");
 module.exports.getAllFilesFromDirectory = getAllFilesFromDirectory;
 module.exports.getFileStringCount = getFileStringCount;
 module.exports.fileContainsText = fileContainsText;
