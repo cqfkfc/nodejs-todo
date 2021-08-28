@@ -8,7 +8,16 @@ const {
 } = require("../todo-finder");
 
 describe("search todo in directory", () => {
-  it("6 files should contain keypass TODO - (example provided in github)", async () => {
+  it("if path is a file and not a directory, should throw error", async () => {
+    const testDir = "./test_example/somedir/somemodule/somefile.js";
+    const testPathAbsolute = path.join(__dirname, testDir);
+
+    await getAllFilesFromDirectory(testPathAbsolute).catch((err) => {
+      expect(err).to.be.an("error");
+    });
+  });
+
+  it("output file paths that contains TODO text (case-sensitive)", async () => {
     const testDir = "./test_example";
     const testPathAbsolute = path.join(__dirname, testDir);
 
@@ -44,7 +53,7 @@ describe("search todo in directory", () => {
     expect(resultsClean).to.eql(expectedOutput);
   });
 
-  it("the text should not be case sensitive e.g. todo should catch TODO", async () => {
+  it("output file paths that contains todo text (not case-sensitive) ", async () => {
     const testDir = "./test_example";
     const testPathAbsolute = path.join(__dirname, testDir);
 
@@ -74,21 +83,12 @@ describe("search todo in directory", () => {
       .filter((file) => file.containsText === true)
       .map((file) => file.filepath);
 
-    // there should only be 6 files
     expect(resultsClean.length).to.equal(7);
 
     expect(resultsClean).to.eql(expectedOutput);
   });
-  it("if path is a file, should throw error", async () => {
-    const testDir = "./test_example/somedir/somemodule/somefile.js";
-    const testPathAbsolute = path.join(__dirname, testDir);
 
-    await getAllFilesFromDirectory(testPathAbsolute).catch((err) => {
-      expect(err).to.be.an("error");
-    });
-  });
-
-  it("text not found in any files", async () => {
+  it("output file paths that contains a text that doesnt exist", async () => {
     const testDir = "./test_example";
     const testPathAbsolute = path.join(__dirname, testDir);
 
@@ -112,7 +112,7 @@ describe("search todo in directory", () => {
     expect(resultsClean.length).to.equal(0);
   });
 
-  it("get count of string when text is not case sensitive e.g. todo should catch TODO", async () => {
+  it("get count of string when text is not case-sensitive e.g. todo should catch TODO", async () => {
     const testDir = "./test_example";
     const testPathAbsolute = path.join(__dirname, testDir);
 
@@ -141,7 +141,7 @@ describe("search todo in directory", () => {
       { filepath: "somefile.js", stringCount: 2 },
     ]);
   });
-  it("get count of string when text is case sensitive e.g. todo should NOT catch TODO", async () => {
+  it("get count of string when text is case-sensitive e.g. todo should NOT catch TODO", async () => {
     const testDir = "./test_example";
     const testPathAbsolute = path.join(__dirname, testDir);
 
