@@ -1,11 +1,33 @@
 const path = require("path");
 const fs = require("graceful-fs"); // to prevent open too many files error at fs.readFile()
+const yargs = require("yargs");
 
-var fileContainsText = function (data, text, caseSensitive) {
+const argv = yargs
+  .command("lyr", "Outputs file paths that contain TODO text", {
+    year: {
+      description: "the year to check for",
+      alias: "y",
+      type: "number",
+    },
+  })
+  .option("caseSensitive", {
+    alias: "cs",
+    description: "Search Text is case sensitive",
+    type: "boolean",
+  })
+  .option("count", {
+    alias: "c",
+    description: "Also returns the number of occurrence in text",
+    type: "boolean",
+  })
+  .help()
+  .alias("help", "h").argv;
+
+var getFileContainsText = function (data, text, caseSensitive) {
   if (caseSensitive) {
-    return data.toString().toLowerCase().includes(text.toLowerCase());
+    return data.includes(text);
   }
-  return data.includes(text);
+  return data.toString().toLowerCase().includes(text.toLowerCase());
 };
 
 var getFileStringCount = function (fileBuffer, text, caseSensitive) {
@@ -49,33 +71,38 @@ var getAllFilesFromDirectory = async function (directoryAbsolutePath) {
     .flat(Infinity);
 };
 
-var run = async function (testPathAbsolute, text) {
+var run = async function (
+  testPathAbsolute,
+  text,
+  caseSensitive,
+  returnCountString
+) {
   const files = await getAllFilesFromDirectory(testPathAbsolute);
   const results = await Promise.all(
     files.map(async (file) => ({
       filepath: path.relative(testPathAbsolute, file.filepath),
-      containsText: fileContainsText(file.data, text, (caseSensitive = false)),
+      value: returnCountString
+        ? getFileStringCount(file.data, text, (caseSensitive = caseSensitive))
+        : getFileContainsText(file.data, text, (caseSensitive = caseSensitive)),
     }))
   );
-
-  const resultsClean = results
-    .filter((file) => file.containsText === true)
-    .map((file) => file.filepath);
-
-  console.log(resultsClean);
+  if (returnCountString) {
+    const resultsClean = results.filter((file) => file.value > 0);
+    console.log(resultsClean);
+  } else {
+    const resultsClean = results
+      .filter((file) => file.value === true)
+      .map((file) => file.filepath);
+    console.log(resultsClean);
+  }
 };
 
-function convertUserInputToAbsolutePath(userInput) {
-  const testPath = "/test/test_example";
-  const absolutepath =
-    userInput === undefined
-      ? path.join(__dirname, testPath)
-      : path.join(__dirname, userInput);
-  return absolutepath;
-}
-
-const absPath = convertUserInputToAbsolutePath(process.argv[2]);
-run(absPath, "TODO");
+run(
+  path.join(__dirname, process.argv[2] || ""),
+  "todo",
+  argv.caseSensitive,
+  argv.count
+);
 module.exports.getAllFilesFromDirectory = getAllFilesFromDirectory;
 module.exports.getFileStringCount = getFileStringCount;
-module.exports.fileContainsText = fileContainsText;
+module.exports.getFileContainsText = getFileContainsText;

@@ -4,7 +4,7 @@ const path = require("path");
 const {
   getAllFilesFromDirectory,
   getFileStringCount,
-  fileContainsText,
+  getFileContainsText,
 } = require("../todo-finder");
 
 describe("search todo in directory", () => {
@@ -35,16 +35,12 @@ describe("search todo in directory", () => {
     const results = await Promise.all(
       files.map(async (file) => ({
         filepath: path.relative(testPathAbsolute, file.filepath),
-        containsText: fileContainsText(
-          file.data,
-          "TODO",
-          (caseSensitive = false)
-        ),
+        value: getFileContainsText(file.data, "TODO", (caseSensitive = true)),
       }))
     );
 
     const resultsClean = results
-      .filter((file) => file.containsText === true)
+      .filter((file) => file.value === true)
       .map((file) => file.filepath);
 
     // there should only be 6 files
@@ -71,16 +67,12 @@ describe("search todo in directory", () => {
     const results = await Promise.all(
       files.map(async (file) => ({
         filepath: path.relative(testPathAbsolute, file.filepath),
-        containsText: fileContainsText(
-          file.data,
-          "todo",
-          (caseSensitive = true)
-        ),
+        value: getFileContainsText(file.data, "todo", (caseSensitive = false)),
       }))
     );
 
     const resultsClean = results
-      .filter((file) => file.containsText === true)
+      .filter((file) => file.value === true)
       .map((file) => file.filepath);
 
     expect(resultsClean.length).to.equal(7);
@@ -96,7 +88,7 @@ describe("search todo in directory", () => {
     const results = await Promise.all(
       files.map(async (file) => ({
         filepath: path.relative(testPathAbsolute, file.filepath),
-        containsText: fileContainsText(
+        value: getFileContainsText(
           file.data,
           "thisTextThatDoesntExist",
           (caseSensitive = true)
@@ -120,25 +112,21 @@ describe("search todo in directory", () => {
     const results = await Promise.all(
       files.map(async (file) => ({
         filepath: path.relative(testPathAbsolute, file.filepath),
-        stringCount: getFileStringCount(
-          file.data,
-          "TODO",
-          (caseSensitive = false)
-        ),
+        value: getFileStringCount(file.data, "TODO", (caseSensitive = false)),
       }))
     );
 
     expect(results).to.eql([
-      { filepath: "somedir\\somemodule\\somefile.js", stringCount: 2 },
-      { filepath: "somedir\\somemodule\\someotherfile.js", stringCount: 1 },
-      { filepath: "somedir2\\anotherdir\\index.js", stringCount: 1 },
+      { filepath: "somedir\\somemodule\\somefile.js", value: 2 },
+      { filepath: "somedir\\somemodule\\someotherfile.js", value: 1 },
+      { filepath: "somedir2\\anotherdir\\index.js", value: 1 },
       {
         filepath: "somedir2\\anotherdir\\yet_another_dir\\index.js",
-        stringCount: 1,
+        value: 1,
       },
-      { filepath: "somedir2\\index.js", stringCount: 1 },
-      { filepath: "somedir3\\another_file.js", stringCount: 1 },
-      { filepath: "somefile.js", stringCount: 2 },
+      { filepath: "somedir2\\index.js", value: 1 },
+      { filepath: "somedir3\\another_file.js", value: 1 },
+      { filepath: "somefile.js", value: 2 },
     ]);
   });
   it("get count of string when text is case-sensitive e.g. todo should NOT catch TODO", async () => {
@@ -148,11 +136,11 @@ describe("search todo in directory", () => {
     const expectedOutput = [
       {
         filepath: "somedir\\somemodule\\somefile.js",
-        stringCount: 1,
+        value: 1,
       },
       {
         filepath: "somefile.js",
-        stringCount: 1,
+        value: 1,
       },
     ];
 
@@ -160,15 +148,11 @@ describe("search todo in directory", () => {
     const results = await Promise.all(
       files.map(async (file) => ({
         filepath: path.relative(testPathAbsolute, file.filepath),
-        stringCount: getFileStringCount(
-          file.data,
-          "todo",
-          (caseSensitive = true)
-        ),
+        value: getFileStringCount(file.data, "todo", (caseSensitive = true)),
       }))
     );
 
-    const resultsClean = results.filter((file) => file.stringCount > 0);
+    const resultsClean = results.filter((file) => file.value > 0);
 
     expect(resultsClean.length).to.equal(2);
 
